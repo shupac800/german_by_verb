@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>German By Verb — Flashcards</title>
+<style>
+  :root {
+    --bg: #fafaf9;
+    --card-bg: #fff;
+    --text: #1c1917;
+    --text-muted: #78716c;
+    --border: #e7e5e4;
+    --accent: #4f46e5;
+    --accent-hover: #4338ca;
+    --input-bg: #fff;
+    --input-border: #d6d3d1;
+    --score-low: #dc2626;
+    --score-mid: #ca8a04;
+    --score-high: #16a34a;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1917;
+      --card-bg: #292524;
+      --text: #fafaf9;
+      --text-muted: #a8a29e;
+      --border: #44403c;
+      --accent: #818cf8;
+      --accent-hover: #6366f1;
+      --input-bg: #292524;
+      --input-border: #57534e;
+    }
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .subtitle {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    margin-bottom: 2rem;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 520px;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.4rem;
+  }
+
+  input[type="password"],
+  input[type="text"],
+  textarea,
+  select {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    background: var(--input-bg);
+    color: var(--text);
+    font-size: 0.95rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--accent);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  .field { margin-bottom: 1rem; }
+  .field:last-child { margin-bottom: 0; }
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.65rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-family: inherit;
+  }
+
+  button:hover { background: var(--accent-hover); }
+  button:disabled { opacity: 0.5; cursor: default; }
+
+  .btn-row {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    flex-wrap: wrap;
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+  .btn-secondary:hover {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .verb-display {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .verb-name {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+
+  .verb-sep {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.3rem 1rem;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .info-label {
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .score-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 auto 1rem;
+  }
+
+  .explanation {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+  }
+
+  .example {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+  }
+
+  .correct-meanings {
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 1rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .correct-meanings strong {
+    display: block;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+  }
+
+  .stats {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+
+  .stats span { font-weight: 600; color: var(--text); }
+
+  .hidden { display: none !important; }
+
+  .error {
+    color: var(--score-low);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+  }
+
+  .filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 0.5rem 0;
+  }
+
+  .chip {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .chip.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .loading::after {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #fff;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin-left: 0.5rem;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin-top: 0.75rem;
+  }
+  .summary-table th, .summary-table td {
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+  .summary-table th {
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+</style>
+</head>
+<body>
+
+<h1>German By Verb</h1>
+<p class="subtitle">Prefix + Stem Flashcards</p>
+
+<!-- Setup Screen -->
+<div id="setup" class="card">
+  <div class="field">
+    <label for="api-key">Anthropic API Key (auto-loaded from .env if available)</label>
+    <input type="password" id="api-key" placeholder="sk-ant-...">
+  </div>
+  <div class="field">
+    <label>Filter by Stem (optional — click to toggle)</label>
+    <input type="text" id="stem-search" placeholder="Type to filter...">
+    <div id="stem-chips" class="filter-chips"></div>
+  </div>
+  <div class="btn-row">
+    <button id="start-btn">Start</button>
+  </div>
+  <p id="setup-error" class="error hidden"></p>
+</div>
+
+<!-- Card Screen -->
+<div id="quiz" class="card hidden">
+  <div class="stats">
+    Card <span id="card-num">1</span> / <span id="card-total">?</span>
+    &nbsp;&middot;&nbsp;
+    Avg score: <span id="avg-score">—</span>
+  </div>
+  <div class="verb-display">
+    <div class="verb-name" id="verb-name"></div>
+    <div class="verb-sep" id="verb-sep"></div>
+  </div>
+  <div class="info-grid">
+    <div class="info-label">Stem</div>
+    <div id="stem-info"></div>
+    <div class="info-label">Prefix</div>
+    <div id="prefix-info"></div>
+  </div>
+  <div class="field">
+    <label for="guess">What do you think this verb means?</label>
+    <textarea id="guess" placeholder="Your guess..."></textarea>
+  </div>
+  <div class="btn-row">
+    <button id="submit-btn">Submit</button>
+    <button id="idk-btn" class="btn-secondary">I Don't Know</button>
+    <button id="skip-btn" class="btn-secondary">Skip</button>
+    <button id="end-btn" class="btn-secondary">End Session</button>
+  </div>
+  <p id="quiz-error" class="error hidden"></p>
+</div>
+
+<!-- Score Screen -->
+<div id="result" class="card hidden">
+  <div class="stats">
+    Card <span id="r-card-num">1</span> / <span id="r-card-total">?</span>
+    &nbsp;&middot;&nbsp;
+    Avg score: <span id="r-avg-score">—</span>
+  </div>
+  <div style="text-align:center">
+    <div class="score-badge" id="score-badge"></div>
+  </div>
+  <div class="explanation" id="explanation"></div>
+  <div class="example hidden" id="example-block"></div>
+  <div class="correct-meanings">
+    <strong id="correct-label">VERB</strong>
+    <div id="correct-meanings"></div>
+  </div>
+  <div class="btn-row">
+    <button id="next-btn">Next Card</button>
+    <button id="end-btn-2" class="btn-secondary">End Session</button>
+  </div>
+</div>
+
+<!-- Summary Screen -->
+<div id="summary" class="card hidden">
+  <h2 style="margin-bottom:1rem;font-size:1.25rem">Session Summary</h2>
+  <div class="stats" style="margin-bottom:0.5rem">
+    Cards: <span id="sum-total">0</span>
+    &nbsp;&middot;&nbsp;
+    Average: <span id="sum-avg">—</span>
+  </div>
+  <table class="summary-table" id="summary-table">
+    <thead><tr><th>Verb</th><th>Score</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <div class="btn-row">
+    <button id="restart-btn">New Session</button>
+  </div>
+</div>
+
+<script>
+const APP = {
+  data: [],
+  deck: [],
+  index: 0,
+  scores: [],     // {verb, score}
+  currentCard: null,
+};
+
+// --- Data loading ---
+async function loadData() {
+  const resp = await fetch('flashcard_data.json');
+  APP.data = await resp.json();
+}
+
+// --- Stem chips ---
+function renderChips() {
+  const container = document.getElementById('stem-chips');
+  container.innerHTML = '';
+  const stems = APP.data.map(s => s.stem).sort();
+  const search = document.getElementById('stem-search').value.toUpperCase();
+  const visible = search ? stems.filter(s => s.includes(search)) : stems;
+
+  for (const stem of visible) {
+    const chip = document.createElement('span');
+    chip.className = 'chip' + (APP._selectedStems.has(stem) ? ' active' : '');
+    chip.textContent = stem;
+    chip.onclick = () => {
+      if (APP._selectedStems.has(stem)) APP._selectedStems.delete(stem);
+      else APP._selectedStems.add(stem);
+      renderChips();
+    };
+    container.appendChild(chip);
+  }
+}
+
+// --- Deck building ---
+function buildDeck() {
+  let stems = APP.data;
+  if (APP._selectedStems.size > 0) {
+    stems = stems.filter(s => APP._selectedStems.has(s.stem));
+  }
+  const cards = [];
+  for (const s of stems) {
+    for (const c of s.cards) {
+      cards.push({ ...c, stem: s.stem, stem_translation: s.stem_translation });
+    }
+  }
+  // Shuffle
+  for (let i = cards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [cards[i], cards[j]] = [cards[j], cards[i]];
+  }
+  return cards;
+}
+
+// --- Screen management ---
+function show(id) {
+  for (const s of ['setup', 'quiz', 'result', 'summary']) {
+    document.getElementById(s).classList.toggle('hidden', s !== id);
+  }
+}
+
+// --- Stats ---
+function avgScore() {
+  if (APP.scores.length === 0) return '—';
+  const avg = APP.scores.reduce((a, b) => a + b.score, 0) / APP.scores.length;
+  return avg.toFixed(1);
+}
+
+function updateStats() {
+  const num = APP.index + 1;
+  const total = APP.deck.length;
+  const avg = avgScore();
+  for (const el of document.querySelectorAll('[id$="card-num"]')) el.textContent = num;
+  for (const el of document.querySelectorAll('[id$="card-total"]')) el.textContent = total;
+  for (const el of document.querySelectorAll('[id$="avg-score"]')) el.textContent = avg;
+}
+
+// --- Show card ---
+function showCard() {
+  if (APP.index >= APP.deck.length) {
+    showSummary();
+    return;
+  }
+  const c = APP.deck[APP.index];
+  APP.currentCard = c;
+
+  document.getElementById('verb-name').textContent = c.verb;
+  document.getElementById('verb-sep').textContent = c.separability ? `(${c.separability})` : '';
+  document.getElementById('stem-info').textContent = `${c.stem} = ${c.stem_translation}`;
+  document.getElementById('prefix-info').textContent = c.prefix_hint
+    ? `${c.prefix} = "${c.prefix_hint}"`
+    : c.prefix;
+  document.getElementById('guess').value = '';
+  document.getElementById('quiz-error').classList.add('hidden');
+
+  updateStats();
+  show('quiz');
+  document.getElementById('guess').focus();
+}
+
+// --- Score color ---
+function scoreColor(score) {
+  if (score <= 3) return 'var(--score-low)';
+  if (score <= 6) return 'var(--score-mid)';
+  return 'var(--score-high)';
+}
+
+// --- Load API key from .env file ---
+async function loadEnvKey() {
+  try {
+    const resp = await fetch('.env');
+    if (!resp.ok) return null;
+    const text = await resp.text();
+    const match = text.match(/^ANTHROPIC_API_KEY=(.+)$/m);
+    return match ? match[1].trim() : null;
+  } catch {
+    return null;
+  }
+}
+
+// --- API calls ---
+function callClaude(prompt) {
+  const apiKey = localStorage.getItem('gbv-api-key');
+  return fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 256,
+      messages: [{ role: 'user', content: prompt }],
+    }),
+  }).then(async (resp) => {
+    if (!resp.ok) {
+      const err = await resp.text();
+      throw new Error(`API error ${resp.status}: ${err}`);
+    }
+    const data = await resp.json();
+    const text = data.content[0].text;
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Could not parse response');
+    return JSON.parse(jsonMatch[0]);
+  });
+}
+
+async function scoreGuess(card, guess) {
+  const prompt = `You are scoring a German language learner's guess about a compound verb. Address the learner as "you." Explain what the verb actually means and how the prefix shapes the stem. No cheerleading, no filler ("unfortunately", "great job", "keep it up"), no exclamation points.
+
+Tone rule: if the guess is good, you may acknowledge what the learner got right. But the worse the guess, the less you should say about the guess itself — just explain the verb. Never comment on how wrong the guess is (no "your guess has no connection", "you missed it entirely", "completely off", etc.). For a bad guess, simply explain the verb as if the learner asked "what does this mean?"
+
+English mnemonic: consider whether a literal English translation of prefix + stem suggests the German meaning. For example, ankommen: "an" = "at" + "kommen" = "come" — "come at" suggests "arrive." If such a parallel exists, mention it as a mnemonic. If the compound is opaque and no literal English rendering helps, say so briefly (e.g. "there is no obvious English calque here").
+
+Stem: ${card.stem} = ${card.stem_translation}
+Prefix: ${card.prefix} = ${card.prefix_hint || '(no hint available)'}
+Compound verb: ${card.verb} (${card.separability || 'unknown separability'})
+Correct meanings: ${card.translations}
+
+The learner guessed: "${guess}"
+
+Score 1-10 where:
+- 1-2: Completely wrong or unrelated
+- 3-4: Shows some awareness of prefix/stem but meaning is off
+- 5-6: Partially correct, captures one sense or the general direction
+- 7-8: Good understanding, captures the core meaning(s)
+- 9-10: Excellent, accurately describes the verb's meaning(s)
+
+Respond in JSON: {"score": N, "explanation": "brief, substantive feedback — no filler, no exclamation points", "example_de": "a short German sentence using the verb", "example_en": "its English translation"}`;
+  return callClaude(prompt);
+}
+
+async function explainVerb(card) {
+  const prompt = `Explain a German compound verb to a learner. Address them as "you." Explain what the verb means and how the prefix shapes the stem. No cheerleading, no filler, no exclamation points. Just clear, informative explanation.
+
+English mnemonic: consider whether a literal English translation of prefix + stem suggests the German meaning. For example, ankommen: "an" = "at" + "kommen" = "come" — "come at" suggests "arrive." If such a parallel exists, mention it as a mnemonic. If the compound is opaque and no literal English rendering helps, say so briefly (e.g. "there is no obvious English calque here").
+
+Stem: ${card.stem} = ${card.stem_translation}
+Prefix: ${card.prefix} = ${card.prefix_hint || '(no hint available)'}
+Compound verb: ${card.verb} (${card.separability || 'unknown separability'})
+Meanings: ${card.translations}
+
+Respond in JSON: {"explanation": "brief, substantive explanation — no filler, no exclamation points", "example_de": "a short German sentence using the verb", "example_en": "its English translation"}`;
+  return callClaude(prompt);
+}
+
+
+// --- Show result ---
+function showResult(score, explanation, card, exampleDe, exampleEn) {
+  document.getElementById('score-badge').textContent = score;
+  document.getElementById('score-badge').style.background = scoreColor(score);
+  document.getElementById('explanation').textContent = explanation;
+  const exBlock = document.getElementById('example-block');
+  if (exampleDe && exampleEn) {
+    exBlock.innerHTML = `<em>${exampleDe}</em><br>${exampleEn}`;
+    exBlock.classList.remove('hidden');
+  } else {
+    exBlock.classList.add('hidden');
+  }
+  document.getElementById('correct-label').textContent = card.verb;
+  document.getElementById('correct-meanings').textContent = card.translations;
+  updateStats();
+  show('result');
+}
+
+// --- Summary ---
+function showSummary() {
+  document.getElementById('sum-total').textContent = APP.scores.length;
+  document.getElementById('sum-avg').textContent = avgScore();
+
+  const tbody = document.querySelector('#summary-table tbody');
+  tbody.innerHTML = '';
+  for (const { verb, score } of APP.scores) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${verb}</td><td style="color:${scoreColor(score)};font-weight:600">${score}</td>`;
+    tbody.appendChild(tr);
+  }
+  show('summary');
+}
+
+// --- Event handlers ---
+document.getElementById('start-btn').onclick = () => {
+  const key = document.getElementById('api-key').value.trim();
+  if (!key) {
+    document.getElementById('setup-error').textContent = 'Please enter your API key.';
+    document.getElementById('setup-error').classList.remove('hidden');
+    return;
+  }
+  localStorage.setItem('gbv-api-key', key);
+  APP.deck = buildDeck();
+  if (APP.deck.length === 0) {
+    document.getElementById('setup-error').textContent = 'No cards available for selected stems.';
+    document.getElementById('setup-error').classList.remove('hidden');
+    return;
+  }
+  APP.index = 0;
+  APP.scores = [];
+  showCard();
+};
+
+document.getElementById('submit-btn').onclick = async () => {
+  const guess = document.getElementById('guess').value.trim();
+  if (!guess) return;
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.classList.add('loading');
+  btn.textContent = 'Scoring';
+  document.getElementById('quiz-error').classList.add('hidden');
+
+  try {
+    const { score, explanation, example_de, example_en } = await scoreGuess(APP.currentCard, guess);
+    APP.scores.push({ verb: APP.currentCard.verb, score });
+    showResult(score, explanation, APP.currentCard, example_de, example_en);
+  } catch (e) {
+    document.getElementById('quiz-error').textContent = e.message;
+    document.getElementById('quiz-error').classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('loading');
+    btn.textContent = 'Submit';
+  }
+};
+
+document.getElementById('idk-btn').onclick = async () => {
+  const btn = document.getElementById('idk-btn');
+  btn.disabled = true;
+  btn.classList.add('loading');
+  btn.textContent = 'Loading';
+  document.getElementById('quiz-error').classList.add('hidden');
+
+  try {
+    const { explanation, example_de, example_en } = await explainVerb(APP.currentCard);
+    APP.scores.push({ verb: APP.currentCard.verb, score: 0 });
+    showResult(0, explanation, APP.currentCard, example_de, example_en);
+  } catch (e) {
+    document.getElementById('quiz-error').textContent = e.message;
+    document.getElementById('quiz-error').classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('loading');
+    btn.textContent = "I Don't Know";
+  }
+};
+
+document.getElementById('skip-btn').onclick = () => {
+  APP.index++;
+  showCard();
+};
+
+document.getElementById('next-btn').onclick = () => {
+  APP.index++;
+  showCard();
+};
+
+document.getElementById('end-btn').onclick = showSummary;
+document.getElementById('end-btn-2').onclick = showSummary;
+
+document.getElementById('restart-btn').onclick = () => {
+  show('setup');
+};
+
+document.getElementById('stem-search').oninput = renderChips;
+
+// Allow Enter to submit guess
+document.getElementById('guess').onkeydown = (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    document.getElementById('submit-btn').click();
+  }
+};
+
+// --- Init ---
+(async () => {
+  await loadData();
+  APP._selectedStems = new Set();
+
+  // Load API key: .env file > localStorage
+  const envKey = await loadEnvKey();
+  if (envKey) {
+    document.getElementById('api-key').value = envKey;
+    localStorage.setItem('gbv-api-key', envKey);
+  } else {
+    const saved = localStorage.getItem('gbv-api-key');
+    if (saved) document.getElementById('api-key').value = saved;
+  }
+
+  renderChips();
+})();
+</script>
+</body>
+</html>
