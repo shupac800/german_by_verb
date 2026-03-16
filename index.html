@@ -542,6 +542,8 @@ Tone rule: if the guess is good, you may acknowledge what the learner got right.
 
 English mnemonic: consider whether a literal English translation of prefix + stem suggests the German meaning. For example, ankommen: "an" = "at" + "kommen" = "come" — "come at" suggests "arrive." If such a parallel exists, mention it as a mnemonic. If the compound is opaque and no literal English rendering helps, say so briefly (e.g. "there is no obvious English calque here").
 
+If the verb has notable idiomatic or figurative uses beyond its literal meaning, mention them briefly. For example, "ablegen" literally means to put down, but idiomatically it is used for taking an exam (eine Prüfung ablegen) or breaking a habit (eine Gewohnheit ablegen).
+
 Stem: ${card.stem} = ${card.stem_translation}
 Prefix: ${card.prefix} = ${card.prefix_hint || '(no hint available)'}
 Compound verb: ${card.verb} (${card.separability || 'unknown separability'})
@@ -556,7 +558,9 @@ Score 1-10 where:
 - 7-8: Good understanding, captures the core meaning(s)
 - 9-10: Excellent, accurately describes the verb's meaning(s)
 
-Respond in JSON: {"score": N, "explanation": "brief, substantive feedback — no filler, no exclamation points", "example_de": "a short German sentence using the verb", "example_en": "its English translation"}`;
+Wrap all German words and phrases in the explanation in *asterisks* for emphasis (e.g. *ablegen*, *eine Prüfung ablegen*).
+
+Respond in JSON: {"score": N, "explanation": "brief, substantive feedback — no filler, no exclamation points, German words in *asterisks*", "example_de": "a short German sentence using the verb", "example_en": "its English translation"}`;
   return callClaude(prompt);
 }
 
@@ -565,21 +569,31 @@ async function explainVerb(card) {
 
 English mnemonic: consider whether a literal English translation of prefix + stem suggests the German meaning. For example, ankommen: "an" = "at" + "kommen" = "come" — "come at" suggests "arrive." If such a parallel exists, mention it as a mnemonic. If the compound is opaque and no literal English rendering helps, say so briefly (e.g. "there is no obvious English calque here").
 
+If the verb has notable idiomatic or figurative uses beyond its literal meaning, mention them briefly. For example, "ablegen" literally means to put down, but idiomatically it is used for taking an exam (eine Prüfung ablegen) or breaking a habit (eine Gewohnheit ablegen).
+
 Stem: ${card.stem} = ${card.stem_translation}
 Prefix: ${card.prefix} = ${card.prefix_hint || '(no hint available)'}
 Compound verb: ${card.verb} (${card.separability || 'unknown separability'})
 Meanings: ${card.translations}
 
-Respond in JSON: {"explanation": "brief, substantive explanation — no filler, no exclamation points", "example_de": "a short German sentence using the verb", "example_en": "its English translation"}`;
+Wrap all German words and phrases in the explanation in *asterisks* for emphasis (e.g. *ablegen*, *eine Prüfung ablegen*).
+
+Respond in JSON: {"explanation": "brief, substantive explanation — no filler, no exclamation points, German words in *asterisks*", "example_de": "a short German sentence using the verb", "example_en": "its English translation"}`;
   return callClaude(prompt);
 }
 
+
+// --- Render *text* as <em>text</em>, escaping HTML first ---
+function renderMarkdownItalics(text) {
+  const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return escaped.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+}
 
 // --- Show result ---
 function showResult(score, explanation, card, exampleDe, exampleEn) {
   document.getElementById('score-badge').textContent = score;
   document.getElementById('score-badge').style.background = scoreColor(score);
-  document.getElementById('explanation').textContent = explanation;
+  document.getElementById('explanation').innerHTML = renderMarkdownItalics(explanation);
   const exBlock = document.getElementById('example-block');
   if (exampleDe && exampleEn) {
     exBlock.innerHTML = `<em>${exampleDe}</em><br>${exampleEn}`;
